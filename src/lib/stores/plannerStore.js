@@ -1,13 +1,49 @@
-import { writable, derived } from 'svelte/store';
+import { writable, derived } from "svelte/store";
 
 // Role definitions
 export const ROLES = [
-  { type: 'engineer', label: 'Engineer', salary: 150000, icon: '👩‍💻', color: 'bg-blue-500' },
-  { type: 'sales', label: 'Sales', salary: 120000, icon: '👨‍💼', color: 'bg-green-500' },
-  { type: 'designer', label: 'Designer', salary: 130000, icon: '🎨', color: 'bg-purple-500' },
-  { type: 'product', label: 'Product Manager', salary: 140000, icon: '📋', color: 'bg-orange-500' },
-  { type: 'data', label: 'Data Analyst', salary: 135000, icon: '📊', color: 'bg-cyan-500' },
-  { type: 'marketing', label: 'Marketing', salary: 110000, icon: '📣', color: 'bg-pink-500' }
+  {
+    type: "engineer",
+    label: "Engineer",
+    salary: 150000,
+    icon: "👩‍💻",
+    color: "bg-blue-500",
+  },
+  {
+    type: "sales",
+    label: "Sales",
+    salary: 120000,
+    icon: "👨‍💼",
+    color: "bg-green-500",
+  },
+  {
+    type: "designer",
+    label: "Designer",
+    salary: 130000,
+    icon: "🎨",
+    color: "bg-purple-500",
+  },
+  {
+    type: "product",
+    label: "Product Manager",
+    salary: 140000,
+    icon: "📋",
+    color: "bg-orange-500",
+  },
+  {
+    type: "data",
+    label: "Data Analyst",
+    salary: 135000,
+    icon: "📊",
+    color: "bg-cyan-500",
+  },
+  {
+    type: "marketing",
+    label: "Marketing",
+    salary: 110000,
+    icon: "📣",
+    color: "bg-pink-500",
+  },
 ];
 
 // Generate month labels (24 months starting from current month)
@@ -17,7 +53,20 @@ function generateMonths() {
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
 
-  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
 
   for (let i = 0; i < 24; i++) {
     const monthIndex = (currentMonth + i) % 12;
@@ -25,7 +74,7 @@ function generateMonths() {
     months.push({
       label: monthNames[monthIndex],
       year: year,
-      fullLabel: `${monthNames[monthIndex]} ${year}`
+      fullLabel: `${monthNames[monthIndex]} ${year}`,
     });
   }
 
@@ -38,46 +87,72 @@ export const MONTHS = generateMonths();
 function createPlannerStore() {
   const { subscribe, set, update } = writable({
     startingCash: 2000000,
-    hires: []
+    hires: [],
   });
 
   return {
     subscribe,
-    setStartingCash: (amount) => update(state => ({ ...state, startingCash: amount })),
-    addHire: (role, startMonth) => update(state => ({
-      ...state,
-      hires: [...state.hires, {
-        id: crypto.randomUUID(),
-        role: role.type,
-        roleLabel: role.label,
-        salary: role.salary,
-        startMonth: startMonth,
-        icon: role.icon,
-        color: role.color
-      }]
-    })),
-    removeHire: (id) => update(state => ({
-      ...state,
-      hires: state.hires.filter(h => h.id !== id)
-    })),
-    reset: () => set({
-      startingCash: 2000000,
-      hires: []
-    })
+    setStartingCash: (amount) =>
+      update((state) => ({ ...state, startingCash: amount })),
+    addHire: (role, startMonth, duration = 1) =>
+      update((state) => ({
+        ...state,
+        hires: [
+          ...state.hires,
+          {
+            id: crypto.randomUUID(),
+            role: role.type,
+            roleLabel: role.label,
+            salary: role.salary,
+            startMonth: startMonth,
+            duration: duration,
+            icon: role.icon,
+            color: role.color,
+          },
+        ],
+      })),
+    updateHireDuration: (id, newDuration, newStartMonth) =>
+      update((state) => ({
+        ...state,
+        hires: state.hires.map((h) =>
+          h.id === id
+            ? {
+                ...h,
+                duration: newDuration,
+                startMonth:
+                  newStartMonth !== undefined ? newStartMonth : h.startMonth,
+              }
+            : h,
+        ),
+      })),
+    removeHire: (id) =>
+      update((state) => ({
+        ...state,
+        hires: state.hires.filter((h) => h.id !== id),
+      })),
+    reset: () =>
+      set({
+        startingCash: 2000000,
+        hires: [],
+      }),
   };
 }
 
 export const plannerStore = createPlannerStore();
 
 // Derived store for calculations
-export const calculations = derived(plannerStore, $planner => {
+export const calculations = derived(plannerStore, ($planner) => {
   const { startingCash, hires } = $planner;
 
   // Calculate monthly burn for each month
   const monthlyBurns = MONTHS.map((_, monthIndex) => {
     return hires
-      .filter(hire => hire.startMonth <= monthIndex)
-      .reduce((sum, hire) => sum + (hire.salary / 12), 0);
+      .filter(
+        (hire) =>
+          hire.startMonth <= monthIndex &&
+          monthIndex < hire.startMonth + hire.duration,
+      )
+      .reduce((sum, hire) => sum + hire.salary / 12, 0);
   });
 
   // Calculate runway
@@ -108,17 +183,17 @@ export const calculations = derived(plannerStore, $planner => {
   const currentBurn = monthlyBurns[0] || 0;
 
   // Runway status
-  let runwayStatus = 'green';
+  let runwayStatus = "green";
   if (runwayMonths < 6) {
-    runwayStatus = 'red';
+    runwayStatus = "red";
   } else if (runwayMonths < 12) {
-    runwayStatus = 'yellow';
+    runwayStatus = "yellow";
   }
 
   return {
     monthlyBurns,
     currentBurn,
     runwayMonths,
-    runwayStatus
+    runwayStatus,
   };
 });
