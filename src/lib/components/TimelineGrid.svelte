@@ -167,7 +167,7 @@
 
     <!-- Grid Container with Scroll -->
     <div
-        class="overflow-x-auto overflow-y-auto max-h-150 border border-gray-200 dark:border-gray-700 rounded-lg select-none bg-white dark:bg-gray-900"
+        class="overflow-x-auto overflow-y-auto max-h-200 border border-gray-200 dark:border-gray-700 rounded-lg select-none bg-white dark:bg-gray-900"
         onmousemove={handleMouseMove}
         role="grid"
         tabindex="0"
@@ -215,7 +215,7 @@
                         <div
                             class="shrink-0 w-20 border-r border-gray-200 dark:border-gray-700 p-2 {descriptiveMode
                                 ? 'min-h-36'
-                                : 'min-h-20'} flex items-center justify-center relative
+                                : 'min-h-16'} flex items-center justify-center relative
                             {hoveredCell?.row === hireIndex &&
                             hoveredCell?.month === monthIndex
                                 ? 'ring-2 ring-blue-500 ring-inset dark:ring-blue-400'
@@ -240,7 +240,7 @@
                                     {#if isStart}
                                         <!-- Left resize handle -->
                                         <div
-                                            class="absolute left-0 top-0 bottom-0 w-2 bg-white/30 hover:bg-white/50 cursor-ew-resize opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                            class="absolute left-0 top-0 bottom-0 w-2 bg-white/30 hover:bg-white/50 cursor-ew-resize opacity-0 group-hover:opacity-100 transition-opacity z-10 rounded-l-lg"
                                             onmousedown={(e) =>
                                                 handleResizeStart(
                                                     e,
@@ -307,7 +307,7 @@
                                     {#if isEnd}
                                         <!-- Right resize handle -->
                                         <div
-                                            class="absolute right-0 top-0 bottom-0 w-2 bg-white/30 hover:bg-white/50 cursor-ew-resize opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                            class="absolute right-0 top-0 bottom-0 w-2 bg-white/30 hover:bg-white/50 cursor-ew-resize opacity-0 group-hover:opacity-100 transition-opacity z-10 rounded-r-lg"
                                             onmousedown={(e) =>
                                                 handleResizeStart(
                                                     e,
@@ -332,13 +332,13 @@
                 <div
                     class="flex border-b border-gray-100 dark:border-gray-800 hover:bg-blue-50/30 dark:hover:bg-gray-800/30 {descriptiveMode
                         ? 'min-h-32'
-                        : 'min-h-20'}"
+                        : 'min-h-16'}"
                 >
                     <!-- Month cells -->
                     {#each MONTHS as month, monthIndex (monthIndex)}
                         <div
                             class="shrink-0 w-20 border-r border-gray-200 dark:border-gray-700 p-2 flex items-center justify-center relative
-                            {descriptiveMode ? 'min-h-32' : 'min-h-20'}
+                            {descriptiveMode ? 'min-h-32' : 'min-h-16'}
                             transition-colors bg-gray-50/30 dark:bg-gray-800/30
                             {hoveredCell?.row === rowIndex &&
                             hoveredCell?.month === monthIndex
@@ -355,7 +355,7 @@
                         >
                             {#if hoveredCell?.row === rowIndex && hoveredCell?.month === monthIndex}
                                 <div
-                                    class="text-blue-600 dark:text-blue-400 text-xs font-medium"
+                                    class="text-blue-600 dark:text-blue-400 text-xs font-medium pointer-events-none"
                                 >
                                     Drop Here
                                 </div>

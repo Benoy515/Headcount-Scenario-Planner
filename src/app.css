@@ -16,11 +16,13 @@
     background-color: #f9fafb;
 }
 
+html,
 body {
     margin: 0;
     padding: 0;
     min-width: 320px;
     min-height: 100vh;
+    overscroll-behavior: none;
 }
 
 #app {
