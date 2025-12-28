@@ -2,20 +2,32 @@
     import FinancialSummary from "./lib/components/FinancialSummary.svelte";
     import TimelineGrid from "./lib/components/TimelineGrid.svelte";
     import RolePalette from "./lib/components/RolePalette.svelte";
-    import { plannerStore } from "./lib/stores/plannerStore.js";
+    import { plannerStore, ROLES } from "./lib/stores/plannerStore.js";
+
+    // Expose to window for debugging (development only)
+    if (typeof window !== "undefined") {
+        (window as any).plannerStore = plannerStore;
+        (window as any).ROLES = ROLES;
+        console.log(
+            "🔧 Debug: plannerStore and ROLES exposed to window. Try: plannerStore.addHire(ROLES[0], 0)",
+        );
+    }
 
     let draggedRole: any = $state(null);
     let timelineRef: HTMLDivElement | null = $state(null);
 
     function handleDragStart(e: DragEvent, role: any) {
+        console.log("🎯 DRAG START:", role.label);
         draggedRole = role;
         if (e.dataTransfer) {
             e.dataTransfer.effectAllowed = "copy";
             e.dataTransfer.setData("text/plain", role.type);
         }
+        console.log("✅ draggedRole set to:", draggedRole);
     }
 
     function handleDragEnd() {
+        console.log("🏁 DRAG END - clearing draggedRole");
         draggedRole = null;
     }
 
@@ -56,23 +68,28 @@
     </header>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Financial Summary -->
-        <FinancialSummary />
+        <div class="max-w-7xl mx-auto">
+            <FinancialSummary />
+        </div>
 
-        <!-- Timeline Grid -->
+        <!-- Calendar Grid -->
         <div
+            class="max-w-400 mx-auto"
             ondragover={(e) => e.preventDefault()}
             ondragend={handleDragEnd}
             bind:this={timelineRef}
             role="region"
-            aria-label="Timeline drag and drop area"
+            aria-label="Calendar drag and drop area"
         >
             <TimelineGrid bind:draggedRole />
         </div>
 
         <!-- Role Palette -->
-        <RolePalette ondragstart={handleDragStart} />
+        <div class="max-w-7xl mx-auto">
+            <RolePalette ondragstart={handleDragStart} />
+        </div>
     </main>
 
     <!-- Footer -->

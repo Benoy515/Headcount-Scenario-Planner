@@ -6,6 +6,8 @@ A professional headcount planning tool that helps startup founders model team gr
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=flat&logo=tailwind-css)
 ![TypeScript](https://img.shields.io/badge/TypeScript-Ready-3178C6?style=flat&logo=typescript)
 
+> 📚 **[View Complete Documentation](docs/)** | [User Guide](docs/USER_GUIDE.md) | [Quick Debug](docs/QUICK_DEBUG.md) | [Implementation](docs/IMPLEMENTATION.md)
+
 ## Features
 
 ### 📊 Financial Summary Dashboard
@@ -100,6 +102,12 @@ src/
 ├── App.svelte                         # Main app component
 ├── app.css                            # Global styles + Tailwind
 └── main.ts                            # App entry point
+
+docs/
+├── IMPLEMENTATION.md                  # Technical documentation (616 lines)
+├── USER_GUIDE.md                      # User instructions (428 lines)
+├── DRAG_AND_DROP.md                   # Drag & drop deep dive (609 lines)
+└── QUICK_DEBUG.md                     # Troubleshooting guide (328 lines)
 ```
 
 ## Technology Stack
@@ -157,6 +165,15 @@ Potential features for future iterations:
 - [ ] Annual salary increases modeling
 - [ ] Team size by role charts
 - [ ] Comparison between scenarios
+
+## Documentation
+
+Comprehensive documentation is available in the `docs/` folder:
+
+- **[IMPLEMENTATION.md](docs/IMPLEMENTATION.md)** - Deep technical documentation covering architecture, state management, calculations, and implementation details
+- **[USER_GUIDE.md](docs/USER_GUIDE.md)** - Complete user manual with step-by-step instructions, scenarios, and FAQ
+- **[DRAG_AND_DROP.md](docs/DRAG_AND_DROP.md)** - Detailed explanation of drag & drop implementation, debugging, and troubleshooting
+- **[QUICK_DEBUG.md](docs/QUICK_DEBUG.md)** - Fast troubleshooting guide for common drag & drop issues
 
 ## License
 
