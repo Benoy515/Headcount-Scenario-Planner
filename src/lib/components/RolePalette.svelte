@@ -6,10 +6,12 @@
         $props();
 </script>
 
-<div class="bg-white shadow-lg rounded-lg p-6">
+<div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
     <div class="mb-4">
-        <h2 class="text-lg font-semibold text-gray-900">Available Roles</h2>
-        <p class="text-sm text-gray-600 mt-1">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+            Available Roles
+        </h2>
+        <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
             Drag any role onto the calendar to schedule a hire
         </p>
     </div>
@@ -40,7 +42,7 @@
 
         <!-- Placeholder for Custom Roles (Future) -->
         <div
-            class="flex items-center justify-center gap-2 p-4 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg text-gray-400 hover:border-gray-400 hover:text-gray-500 transition-all cursor-not-allowed"
+            class="flex items-center justify-center gap-2 p-4 bg-gray-50 dark:bg-gray-700 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-400 dark:text-gray-500 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-500 transition-all cursor-not-allowed"
             title="Custom roles coming soon"
         >
             <svg
@@ -61,8 +63,8 @@
     </div>
 
     <!-- Helper Text -->
-    <div class="mt-4 pt-4 border-t border-gray-200">
-        <div class="text-xs text-gray-500">
+    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div class="text-xs text-gray-500 dark:text-gray-400">
             <strong>Tip:</strong> Click and hold a role card, then drag it to any
             month in the calendar above to add a hire. You can add multiple people
             to the same month.

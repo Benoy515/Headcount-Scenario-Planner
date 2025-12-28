@@ -39,11 +39,13 @@
     );
 </script>
 
-<div class="bg-white shadow-lg rounded-lg p-6 mb-6">
+<div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 mb-6">
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
         <!-- Starting Cash -->
         <div class="space-y-2">
-            <div class="block text-sm font-medium text-gray-600">
+            <div
+                class="block text-sm font-medium text-gray-600 dark:text-gray-300"
+            >
                 Starting Cash
             </div>
             {#if isEditing}
@@ -52,16 +54,18 @@
                     bind:value={inputValue}
                     onblur={handleCashUpdate}
                     onkeydown={handleKeydown}
-                    class="w-full px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    class="w-full px-3 py-2 border border-blue-300 dark:border-blue-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     aria-label="Starting cash amount"
                 />
             {:else}
                 <button
                     onclick={startEditing}
-                    class="w-full text-left px-3 py-2 border border-gray-300 rounded-md hover:border-blue-400 hover:bg-blue-50 transition-colors"
+                    class="w-full text-left px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors bg-white dark:bg-gray-800"
                     aria-label="Edit starting cash"
                 >
-                    <span class="text-2xl font-bold text-gray-900">
+                    <span
+                        class="text-2xl font-bold text-gray-900 dark:text-white"
+                    >
                         {formatCurrency($plannerStore.startingCash)}
                     </span>
                 </button>
@@ -70,33 +74,45 @@
 
         <!-- Monthly Burn Rate -->
         <div class="space-y-2">
-            <div class="block text-sm font-medium text-gray-600">
+            <div
+                class="block text-sm font-medium text-gray-600 dark:text-gray-300"
+            >
                 Monthly Burn Rate
             </div>
             <div class="px-3 py-2">
-                <span class="text-2xl font-bold text-gray-900">
+                <span class="text-2xl font-bold text-gray-900 dark:text-white">
                     {formatCurrency(calc.currentBurn)}
                 </span>
-                <p class="text-xs text-gray-500 mt-1">per month</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    per month
+                </p>
             </div>
         </div>
 
         <!-- Runway -->
         <div class="space-y-2">
-            <div class="block text-sm font-medium text-gray-600">
+            <div
+                class="block text-sm font-medium text-gray-600 dark:text-gray-300"
+            >
                 Runway Remaining
             </div>
             <div class="px-3 py-2">
-                <span class="text-2xl font-bold text-gray-900">
+                <span class="text-2xl font-bold text-gray-900 dark:text-white">
                     {calc.runwayMonths}{calc.runwayMonths >= 24 ? "+" : ""}
                 </span>
-                <p class="text-xs text-gray-500 mt-1">months</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    months
+                </p>
             </div>
         </div>
 
         <!-- Status Indicator -->
         <div class="space-y-2">
-            <div class="block text-sm font-medium text-gray-600">Status</div>
+            <div
+                class="block text-sm font-medium text-gray-600 dark:text-gray-300"
+            >
+                Status
+            </div>
             <div class="px-3 py-2">
                 <span
                     class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border {runwayColor}"
@@ -109,7 +125,7 @@
                         ⚠ Critical
                     {/if}
                 </span>
-                <p class="text-xs text-gray-500 mt-1">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     {#if calc.runwayStatus === "green"}
                         &gt; 12 months
                     {:else if calc.runwayStatus === "yellow"}

@@ -132,26 +132,26 @@
 
 <svelte:window onmouseup={handleMouseUp} />
 
-<div class="bg-white shadow-lg rounded-lg p-6 mb-6">
+<div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 mb-6">
     <div class="flex items-center justify-between mb-4">
         <div>
-            <h2 class="text-lg font-semibold text-gray-900">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 Hiring Timeline Grid
             </h2>
-            <p class="text-sm text-gray-600 mt-1">
+            <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
                 Drag roles onto any month cell to schedule hires. Drag edges to
                 adjust duration.
             </p>
         </div>
         <div class="flex items-center gap-2">
-            <span class="text-sm font-medium text-gray-700"
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300"
                 >Descriptive Mode</span
             >
             <button
                 onclick={() => (descriptiveMode = !descriptiveMode)}
-                class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 {descriptiveMode
+                class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 {descriptiveMode
                     ? 'bg-blue-600'
-                    : 'bg-gray-200'}"
+                    : 'bg-gray-200 dark:bg-gray-600'}"
                 role="switch"
                 aria-checked={descriptiveMode}
                 aria-label="Toggle descriptive mode"
@@ -167,7 +167,7 @@
 
     <!-- Grid Container with Scroll -->
     <div
-        class="overflow-x-auto overflow-y-auto max-h-150 border border-gray-200 rounded-lg select-none"
+        class="overflow-x-auto overflow-y-auto max-h-150 border border-gray-200 dark:border-gray-700 rounded-lg select-none bg-white dark:bg-gray-900"
         onmousemove={handleMouseMove}
         role="grid"
         tabindex="0"
@@ -175,16 +175,20 @@
         <div class="inline-block min-w-full">
             <!-- Header Row: Months -->
             <div
-                class="flex sticky top-0 z-10 bg-gray-50 border-b-2 border-gray-300"
+                class="flex sticky top-0 z-10 bg-gray-50 dark:bg-gray-800 border-b-2 border-gray-300 dark:border-gray-600"
             >
                 {#each MONTHS as month, i (i)}
                     <div
-                        class="shrink-0 w-20 p-2 border-r border-gray-200 text-center"
+                        class="shrink-0 w-20 p-2 border-r border-gray-200 dark:border-gray-700 text-center"
                     >
-                        <div class="text-xs font-semibold text-gray-700">
+                        <div
+                            class="text-xs font-semibold text-gray-700 dark:text-gray-300"
+                        >
                             {month.label}
                         </div>
-                        <div class="text-xs text-gray-500">{month.year}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                            {month.year}
+                        </div>
                         {#if calc.monthlyBurns[i] > 0}
                             <div class="text-xs font-medium text-blue-600 mt-1">
                                 ${(calc.monthlyBurns[i] / 1000).toFixed(0)}k
@@ -196,7 +200,9 @@
 
             <!-- Data Rows: Existing Hires -->
             {#each hires as hire, hireIndex (hire.id)}
-                <div class="flex border-b border-gray-200 hover:bg-gray-50">
+                <div
+                    class="flex border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+                >
                     <!-- Month cells for this hire -->
                     {#each MONTHS as month, monthIndex (monthIndex)}
                         {@const isActive =
@@ -207,12 +213,12 @@
                             monthIndex === hire.startMonth + hire.duration - 1}
 
                         <div
-                            class="shrink-0 w-20 border-r border-gray-200 p-2 {descriptiveMode
+                            class="shrink-0 w-20 border-r border-gray-200 dark:border-gray-700 p-2 {descriptiveMode
                                 ? 'min-h-36'
                                 : 'min-h-20'} flex items-center justify-center relative
                             {hoveredCell?.row === hireIndex &&
                             hoveredCell?.month === monthIndex
-                                ? 'ring-2 ring-blue-500 ring-inset'
+                                ? 'ring-2 ring-blue-500 ring-inset dark:ring-blue-400'
                                 : ''}"
                             ondragover={(e) =>
                                 handleDragOver(e, hireIndex, monthIndex)}
@@ -324,20 +330,20 @@
             {#each Array(emptyRowsCount) as _, emptyIndex (emptyIndex + hires.length)}
                 {@const rowIndex = hires.length + emptyIndex}
                 <div
-                    class="flex border-b border-gray-100 hover:bg-blue-50/30 {descriptiveMode
+                    class="flex border-b border-gray-100 dark:border-gray-800 hover:bg-blue-50/30 dark:hover:bg-gray-800/30 {descriptiveMode
                         ? 'min-h-32'
                         : 'min-h-20'}"
                 >
                     <!-- Month cells -->
                     {#each MONTHS as month, monthIndex (monthIndex)}
                         <div
-                            class="shrink-0 w-20 border-r border-gray-200 p-2 flex items-center justify-center relative
+                            class="shrink-0 w-20 border-r border-gray-200 dark:border-gray-700 p-2 flex items-center justify-center relative
                             {descriptiveMode ? 'min-h-32' : 'min-h-20'}
-                            transition-colors
+                            transition-colors bg-gray-50/30 dark:bg-gray-800/30
                             {hoveredCell?.row === rowIndex &&
                             hoveredCell?.month === monthIndex
-                                ? 'bg-blue-100 ring-2 ring-blue-500 ring-inset'
-                                : 'hover:bg-blue-50'}"
+                                ? 'bg-blue-100 dark:bg-blue-900/30 ring-2 ring-blue-500 ring-inset dark:ring-blue-400'
+                                : 'hover:bg-blue-50 dark:hover:bg-gray-700'}"
                             ondragover={(e) =>
                                 handleDragOver(e, rowIndex, monthIndex)}
                             ondragleave={handleDragLeave}
@@ -348,11 +354,17 @@
                                 1}, month {monthIndex + 1}"
                         >
                             {#if hoveredCell?.row === rowIndex && hoveredCell?.month === monthIndex}
-                                <div class="text-blue-600 text-xs font-medium">
+                                <div
+                                    class="text-blue-600 dark:text-blue-400 text-xs font-medium"
+                                >
                                     Drop Here
                                 </div>
                             {:else}
-                                <div class="text-gray-300 text-xs">+</div>
+                                <div
+                                    class="text-gray-300 dark:text-gray-600 text-xs"
+                                >
+                                    +
+                                </div>
                             {/if}
                         </div>
                     {/each}
@@ -362,7 +374,9 @@
     </div>
 
     <!-- Legend/Help -->
-    <div class="mt-4 flex items-start gap-4 text-xs text-gray-600">
+    <div
+        class="mt-4 flex items-start gap-4 text-xs text-gray-600 dark:text-gray-400"
+    >
         <div class="flex items-center gap-2">
             <div class="w-4 h-4 bg-blue-500 rounded"></div>
             <span>Active employment period</span>
