@@ -5,7 +5,7 @@
 <div
     class="flex items-center gap-3 p-4 bg-white border-2 border-gray-200 rounded-lg hover:border-blue-400 hover:shadow-md transition-all pointer-events-none select-none"
 >
-    <span class="text-3xl">{role.icon}</span>
+    <role.icon class="w-6 h-6 text-gray-700" />
     <div class="flex-1">
         <div class="font-semibold text-gray-900">{role.label}</div>
         <div class="text-sm text-gray-600">

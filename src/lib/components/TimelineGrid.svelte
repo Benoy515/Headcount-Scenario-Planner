@@ -13,6 +13,7 @@
         | { type: "resize-left"; hireId: string }
         | { type: "resize-right"; hireId: string }
         | null = $state(null);
+    let descriptiveMode = $state(false);
 
     function handleDragOver(
         e: DragEvent,
@@ -85,7 +86,7 @@
 
         if (monthIndex < 0 || monthIndex >= 24) return;
 
-        const hire = hires.find((h) => h.id === dragMode.hireId);
+        const hire = hires.find((h) => h.id === dragMode?.hireId);
         if (!hire) return;
 
         if (dragMode.type === "resize-right") {
@@ -142,9 +143,25 @@
                 adjust duration.
             </p>
         </div>
-        <div class="text-sm text-gray-600">
-            {hires.length}
-            {hires.length === 1 ? "hire" : "hires"} planned
+        <div class="flex items-center gap-2">
+            <span class="text-sm font-medium text-gray-700"
+                >Descriptive Mode</span
+            >
+            <button
+                onclick={() => (descriptiveMode = !descriptiveMode)}
+                class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 {descriptiveMode
+                    ? 'bg-blue-600'
+                    : 'bg-gray-200'}"
+                role="switch"
+                aria-checked={descriptiveMode}
+                aria-label="Toggle descriptive mode"
+            >
+                <span
+                    class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform {descriptiveMode
+                        ? 'translate-x-6'
+                        : 'translate-x-1'}"
+                ></span>
+            </button>
         </div>
     </div>
 
@@ -190,8 +207,9 @@
                             monthIndex === hire.startMonth + hire.duration - 1}
 
                         <div
-                            class="shrink-0 w-20 border-r border-gray-200 p-2 min-h-20 flex items-center justify-center relative group
-                            {isActive ? hire.color : 'bg-white'}
+                            class="shrink-0 w-20 border-r border-gray-200 p-2 {descriptiveMode
+                                ? 'min-h-36'
+                                : 'min-h-20'} flex items-center justify-center relative
                             {hoveredCell?.row === hireIndex &&
                             hoveredCell?.month === monthIndex
                                 ? 'ring-2 ring-blue-500 ring-inset'
@@ -205,75 +223,97 @@
                             aria-label="Month {monthIndex +
                                 1} for {hire.roleLabel}"
                         >
-                            {#if isStart}
-                                <!-- Left resize handle -->
+                            {#if isActive}
+                                <!-- Inner bar with rounded corners -->
                                 <div
-                                    class="absolute left-0 top-0 bottom-0 w-2 bg-white/30 hover:bg-white/50 cursor-ew-resize opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                                    onmousedown={(e) =>
-                                        handleResizeStart(e, hire.id, "left")}
-                                    role="button"
-                                    tabindex="0"
-                                    aria-label="Resize start date"
-                                ></div>
-
-                                <!-- Show role info on start month -->
-                                <div class="text-center">
-                                    <div class="text-2xl mb-1">{hire.icon}</div>
-                                    <div
-                                        class="text-xs font-semibold text-white"
-                                    >
-                                        {hire.roleLabel}
-                                    </div>
-                                    <div class="text-xs text-white/90 mt-0.5">
-                                        ${(hire.salary / 1000).toFixed(0)}k/yr
-                                    </div>
-                                    <div class="text-xs text-white/75 mt-0.5">
-                                        {hire.duration}
-                                        {hire.duration === 1
-                                            ? "month"
-                                            : "months"}
-                                    </div>
-                                </div>
-
-                                <!-- Remove button (visible on hover) -->
-                                <button
-                                    onclick={() => handleRemoveHire(hire.id)}
-                                    class="absolute top-1 right-1 w-5 h-5 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold z-10"
-                                    aria-label="Remove hire"
+                                    class="absolute inset-0 flex items-center justify-center m-auto h-[70%] {hire.color}
+                                    {isStart ? 'rounded-l-lg' : ''}
+                                    {isEnd ? 'rounded-r-lg' : ''}
+                                    group"
                                 >
-                                    ×
-                                </button>
+                                    {#if isStart}
+                                        <!-- Left resize handle -->
+                                        <div
+                                            class="absolute left-0 top-0 bottom-0 w-2 bg-white/30 hover:bg-white/50 cursor-ew-resize opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                            onmousedown={(e) =>
+                                                handleResizeStart(
+                                                    e,
+                                                    hire.id,
+                                                    "left",
+                                                )}
+                                            role="button"
+                                            tabindex="0"
+                                            aria-label="Resize start date"
+                                        ></div>
 
-                                {#if isEnd}
-                                    <!-- Right resize handle (also on start if duration is 1) -->
-                                    <div
-                                        class="absolute right-0 top-0 bottom-0 w-2 bg-white/30 hover:bg-white/50 cursor-ew-resize opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                                        onmousedown={(e) =>
-                                            handleResizeStart(
-                                                e,
-                                                hire.id,
-                                                "right",
-                                            )}
-                                        role="button"
-                                        tabindex="0"
-                                        aria-label="Resize end date"
-                                    ></div>
-                                {/if}
-                            {:else if isEnd}
-                                <!-- Right resize handle -->
-                                <div
-                                    class="absolute right-0 top-0 bottom-0 w-2 bg-white/30 hover:bg-white/50 cursor-ew-resize opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                                    onmousedown={(e) =>
-                                        handleResizeStart(e, hire.id, "right")}
-                                    role="button"
-                                    tabindex="0"
-                                    aria-label="Resize end date"
-                                ></div>
-                                <!-- Continuation of hire -->
-                                <div class="text-white/50 text-xs">━━</div>
-                            {:else if isActive}
-                                <!-- Middle of hire -->
-                                <div class="text-white/50 text-xs">━━</div>
+                                        <!-- Show role info on start month -->
+                                        {#if descriptiveMode}
+                                            <div class="text-center">
+                                                <div
+                                                    class="mb-1 flex items-center justify-center"
+                                                >
+                                                    <hire.icon
+                                                        class="w-4 h-4 text-white"
+                                                    />
+                                                </div>
+                                                <div
+                                                    class="text-xs font-semibold text-white"
+                                                >
+                                                    {hire.roleLabel}
+                                                </div>
+                                                <div
+                                                    class="text-xs text-white/90 mt-0.5"
+                                                >
+                                                    ${(
+                                                        hire.salary / 1000
+                                                    ).toFixed(0)}k/yr
+                                                </div>
+                                                <div
+                                                    class="text-xs text-white/75 mt-0.5"
+                                                >
+                                                    {hire.duration}
+                                                    {hire.duration === 1
+                                                        ? "mo"
+                                                        : "mos"}
+                                                </div>
+                                            </div>
+                                        {:else}
+                                            <div
+                                                class="flex items-center justify-center"
+                                            >
+                                                <hire.icon
+                                                    class="w-5 h-5 text-white"
+                                                />
+                                            </div>
+                                        {/if}
+
+                                        <!-- Remove button (visible on hover) -->
+                                        <button
+                                            onclick={() =>
+                                                handleRemoveHire(hire.id)}
+                                            class="absolute top-1 right-1 w-5 h-5 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold z-10"
+                                            aria-label="Remove hire"
+                                        >
+                                            ×
+                                        </button>
+                                    {/if}
+
+                                    {#if isEnd}
+                                        <!-- Right resize handle -->
+                                        <div
+                                            class="absolute right-0 top-0 bottom-0 w-2 bg-white/30 hover:bg-white/50 cursor-ew-resize opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                            onmousedown={(e) =>
+                                                handleResizeStart(
+                                                    e,
+                                                    hire.id,
+                                                    "right",
+                                                )}
+                                            role="button"
+                                            tabindex="0"
+                                            aria-label="Resize end date"
+                                        ></div>
+                                    {/if}
+                                </div>
                             {/if}
                         </div>
                     {/each}
@@ -284,12 +324,15 @@
             {#each Array(emptyRowsCount) as _, emptyIndex (emptyIndex + hires.length)}
                 {@const rowIndex = hires.length + emptyIndex}
                 <div
-                    class="flex border-b border-gray-100 hover:bg-blue-50/30 min-h-20"
+                    class="flex border-b border-gray-100 hover:bg-blue-50/30 {descriptiveMode
+                        ? 'min-h-32'
+                        : 'min-h-20'}"
                 >
                     <!-- Month cells -->
                     {#each MONTHS as month, monthIndex (monthIndex)}
                         <div
-                            class="shrink-0 w-20 border-r border-gray-200 p-2 bg-gray-50/30 flex items-center justify-center
+                            class="shrink-0 w-20 border-r border-gray-200 p-2 flex items-center justify-center relative
+                            {descriptiveMode ? 'min-h-32' : 'min-h-20'}
                             transition-colors
                             {hoveredCell?.row === rowIndex &&
                             hoveredCell?.month === monthIndex

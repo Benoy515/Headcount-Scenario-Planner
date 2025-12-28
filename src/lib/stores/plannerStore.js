@@ -1,4 +1,12 @@
 import { writable, derived } from "svelte/store";
+import {
+  Code2,
+  Briefcase,
+  Palette,
+  ClipboardList,
+  BarChart3,
+  Megaphone,
+} from "lucide-svelte";
 
 // Role definitions
 export const ROLES = [
@@ -6,43 +14,43 @@ export const ROLES = [
     type: "engineer",
     label: "Engineer",
     salary: 150000,
-    icon: "👩‍💻",
-    color: "bg-blue-500",
+    icon: Code2,
+    color: "bg-blue-400",
   },
   {
     type: "sales",
     label: "Sales",
     salary: 120000,
-    icon: "👨‍💼",
-    color: "bg-green-500",
+    icon: Briefcase,
+    color: "bg-green-400",
   },
   {
     type: "designer",
     label: "Designer",
     salary: 130000,
-    icon: "🎨",
-    color: "bg-purple-500",
+    icon: Palette,
+    color: "bg-purple-400",
   },
   {
     type: "product",
     label: "Product Manager",
     salary: 140000,
-    icon: "📋",
-    color: "bg-orange-500",
+    icon: ClipboardList,
+    color: "bg-orange-400",
   },
   {
     type: "data",
     label: "Data Analyst",
     salary: 135000,
-    icon: "📊",
-    color: "bg-cyan-500",
+    icon: BarChart3,
+    color: "bg-cyan-400",
   },
   {
     type: "marketing",
     label: "Marketing",
     salary: 110000,
-    icon: "📣",
-    color: "bg-pink-500",
+    icon: Megaphone,
+    color: "bg-pink-400",
   },
 ];
 
