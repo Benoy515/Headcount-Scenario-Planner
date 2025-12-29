@@ -10,7 +10,7 @@
         <div class="font-medium text-sm text-gray-900 dark:text-white truncate">
             {role.label}
         </div>
-        <div class="text-xs text-gray-600 dark:text-gray-400">
+        <div class="text-xs text-gray-600 dark:text-gray-400 font-semibold">
             ${(role.salary / 1000).toFixed(0)}k/yr
         </div>
     </div>
