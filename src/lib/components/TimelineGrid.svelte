@@ -62,7 +62,7 @@
     }
 
     function handleResizeStart(
-        e: MouseEvent,
+        e: MouseEvent | TouchEvent,
         hireId: string,
         side: "left" | "right",
     ) {
@@ -81,9 +81,26 @@
         const rect = gridElement.getBoundingClientRect();
         const x = e.clientX - rect.left + gridElement.scrollLeft;
 
-        // Calculate which month column we're over (80px per column)
+        processResize(gridElement, x);
+    }
+
+    function handleTouchMove(e: TouchEvent) {
+        if (!dragMode) return;
+
+        const gridElement = e.currentTarget as HTMLElement;
+        const rect = gridElement.getBoundingClientRect();
+        const touch = e.touches[0];
+        const x = touch.clientX - rect.left + gridElement.scrollLeft;
+
+        processResize(gridElement, x);
+    }
+
+    function processResize(gridElement: HTMLElement, x: number) {
+        // Calculate which month column we're over (80px per column + 48px for delete column)
         const columnWidth = 80;
-        const monthIndex = Math.floor(x / columnWidth);
+        const deleteColumnWidth = 48;
+        const adjustedX = x - deleteColumnWidth;
+        const monthIndex = Math.floor(adjustedX / columnWidth);
 
         if (monthIndex < 0 || monthIndex >= 24) return;
 
@@ -123,6 +140,10 @@
         dragMode = null;
     }
 
+    function handleTouchEnd() {
+        dragMode = null;
+    }
+
     const calc = $derived($calculations);
     const hires: any[] = $derived($plannerStore.hires);
 
@@ -131,12 +152,13 @@
     const totalRows = $derived(hires.length + emptyRowsCount);
 </script>
 
-<svelte:window onmouseup={handleMouseUp} />
+<svelte:window onmouseup={handleMouseUp} ontouchend={handleTouchEnd} />
 
 <!-- Grid Container with Scroll -->
 <div
     class="overflow-x-auto overflow-y-auto max-h-150 border border-gray-200 dark:border-gray-700 rounded-lg select-none bg-white dark:bg-gray-900"
     onmousemove={handleMouseMove}
+    ontouchmove={handleTouchMove}
     role="grid"
     tabindex="0"
 >
@@ -227,8 +249,14 @@
                                 {#if isStart}
                                     <!-- Left resize handle -->
                                     <div
-                                        class="absolute left-0 top-0 bottom-0 w-2 bg-white/30 hover:bg-white/50 cursor-ew-resize opacity-0 group-hover:opacity-100 transition-opacity z-10 rounded-l-lg"
+                                        class="absolute left-0 top-0 bottom-0 w-3 bg-white/40 hover:bg-white/60 active:bg-white/70 cursor-ew-resize transition-all z-10 rounded-l-lg touch-manipulation"
                                         onmousedown={(e) =>
+                                            handleResizeStart(
+                                                e,
+                                                hire.id,
+                                                "left",
+                                            )}
+                                        ontouchstart={(e) =>
                                             handleResizeStart(
                                                 e,
                                                 hire.id,
@@ -284,8 +312,14 @@
                                 {#if isEnd}
                                     <!-- Right resize handle -->
                                     <div
-                                        class="absolute right-0 top-0 bottom-0 w-2 bg-white/30 hover:bg-white/50 cursor-ew-resize opacity-0 group-hover:opacity-100 transition-opacity z-10 rounded-r-lg"
+                                        class="absolute right-0 top-0 bottom-0 w-3 bg-white/40 hover:bg-white/60 active:bg-white/70 cursor-ew-resize transition-all z-10 rounded-r-lg touch-manipulation"
                                         onmousedown={(e) =>
+                                            handleResizeStart(
+                                                e,
+                                                hire.id,
+                                                "right",
+                                            )}
+                                        ontouchstart={(e) =>
                                             handleResizeStart(
                                                 e,
                                                 hire.id,
