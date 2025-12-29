@@ -1,23 +1,26 @@
 <script lang="ts">
-    import FinancialSummary from "./lib/components/FinancialSummary.svelte";
-    import TimelineGrid from "./lib/components/TimelineGrid.svelte";
+    import Scenario from "./lib/components/Scenario.svelte";
+    import {
+        scenariosStore,
+        scenarioCalculations,
+    } from "./lib/stores/scenarioStore.js";
+    import { ROLES } from "./lib/stores/plannerStore.js";
+    import { Sun, Moon, Plus } from "lucide-svelte";
     import RolePalette from "./lib/components/RolePalette.svelte";
-    import { plannerStore, ROLES } from "./lib/stores/plannerStore.js";
-    import { Sun, Moon } from "lucide-svelte";
     import { onMount } from "svelte";
 
     // Expose to window for debugging (development only)
     if (typeof window !== "undefined") {
-        (window as any).plannerStore = plannerStore;
+        (window as any).scenariosStore = scenariosStore;
         (window as any).ROLES = ROLES;
-        console.log(
-            "🔧 Debug: plannerStore and ROLES exposed to window. Try: plannerStore.addHire(ROLES[0], 0)",
-        );
+        console.log("🔧 Debug: scenariosStore and ROLES exposed to window.");
     }
 
-    let draggedRole: any = $state(null);
-    let timelineRef: HTMLDivElement | null = $state(null);
     let isDarkMode = $state(false);
+    let draggedRole: any = $state(null);
+
+    const scenarios = $derived($scenariosStore.scenarios);
+    const calculations = $derived($scenarioCalculations);
 
     onMount(() => {
         // Check for saved theme preference or default to light mode
@@ -44,27 +47,8 @@
         }
     }
 
-    function handleDragStart(e: DragEvent, role: any) {
-        console.log("🎯 DRAG START:", role.label);
-        draggedRole = role;
-        if (e.dataTransfer) {
-            e.dataTransfer.effectAllowed = "copy";
-            e.dataTransfer.setData("text/plain", role.type);
-        }
-        console.log("✅ draggedRole set to:", draggedRole);
-    }
-
-    function handleDragEnd() {
-        console.log("🏁 DRAG END - clearing draggedRole");
-        draggedRole = null;
-    }
-
-    function handleReset() {
-        if (
-            confirm("Are you sure you want to reset all hires and start over?")
-        ) {
-            plannerStore.reset();
-        }
+    function handleAddScenario() {
+        scenariosStore.addScenario();
     }
 </script>
 
@@ -101,12 +85,6 @@
                             <Moon class="w-5 h-5" />
                         {/if}
                     </button>
-                    <button
-                        onclick={handleReset}
-                        class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                        Reset All
-                    </button>
                 </div>
             </div>
         </div>
@@ -114,40 +92,48 @@
 
     <!-- Main Content -->
     <main class="px-4 sm:px-6 lg:px-8 py-8">
-        <div class="flex gap-6 max-w-full mx-auto">
-            <!-- Left Sidebar: Role Palette -->
+        <div class="flex gap-6 max-w-full mx-auto h-[calc(100vh-180px)]">
+            <!-- Left Sidebar: Role Palette (Fixed) -->
             <div class="w-64 shrink-0">
-                <RolePalette ondragstart={handleDragStart} />
+                <RolePalette bind:draggedRole />
             </div>
 
-            <!-- Right Content: Combined Financial Summary + Timeline Grid -->
-            <div
-                class="flex-1 min-w-0"
-                ondragover={(e) => e.preventDefault()}
-                ondragend={handleDragEnd}
-                bind:this={timelineRef}
-                role="region"
-                aria-label="Calendar drag and drop area"
-            >
-                <div
-                    class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6"
+            <!-- Right Content: Scrollable Scenarios -->
+            <div class="flex-1 min-w-0 overflow-y-auto pr-2">
+                <!-- Scenarios List -->
+                {#each scenarios as scenario, index (scenario.id)}
+                    {@const calc = calculations.find(
+                        (c) => c.id === scenario.id,
+                    )}
+                    {#if calc}
+                        <Scenario
+                            {scenario}
+                            calculations={calc}
+                            bind:draggedRole
+                        />
+                    {/if}
+                {/each}
+
+                <!-- Add Scenario Button -->
+                <button
+                    onclick={handleAddScenario}
+                    class="w-full py-4 px-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-400 dark:hover:border-blue-500 transition-all flex items-center justify-center gap-3 group"
+                    aria-label="Add new scenario"
                 >
-                    <!-- Financial Summary (inside same box) -->
-                    <FinancialSummary />
-
-                    <!-- Horizontal Divider -->
-                    <div
-                        class="border-t border-gray-200 dark:border-gray-700 my-6"
-                    ></div>
-
-                    <!-- Timeline Grid (inside same box) -->
-                    <TimelineGrid bind:draggedRole />
-                </div>
+                    <Plus
+                        size={24}
+                        strokeWidth={2}
+                        class="text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors"
+                    />
+                    <span
+                        class="text-lg font-semibold text-gray-600 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors"
+                    >
+                        Add New Scenario
+                    </span>
+                </button>
             </div>
         </div>
     </main>
-
-    
 </div>
 
 <style>

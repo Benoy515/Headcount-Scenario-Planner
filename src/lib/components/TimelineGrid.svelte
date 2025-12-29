@@ -1,13 +1,18 @@
 <script lang="ts">
-    import {
-        plannerStore,
-        calculations,
-        MONTHS,
-    } from "../stores/plannerStore.js";
+    import { MONTHS } from "../stores/plannerStore.js";
     import { formatCurrency } from "../utils/calculations.js";
     import { Trash2 } from "lucide-svelte";
 
-    let { draggedRole = $bindable(null) } = $props();
+    let {
+        scenario,
+        calculations,
+        scenarioId,
+        draggedRole = $bindable(null),
+        onAddHire,
+        onUpdateHireDuration,
+        onRemoveHire,
+    } = $props();
+
     let hoveredCell: { row: number; month: number } | null = $state(null);
     let dragMode:
         | { type: "move"; hireId: string; initialMonth: number }
@@ -15,6 +20,9 @@
         | { type: "resize-right"; hireId: string }
         | null = $state(null);
     let descriptiveMode = $state(false);
+
+    const hires = $derived(scenario.hires);
+    const calc = $derived(calculations);
 
     function handleDragOver(
         e: DragEvent,
@@ -48,7 +56,7 @@
                 monthIndex,
                 "with duration 1",
             );
-            plannerStore.addHire(draggedRole, monthIndex, 1);
+            onAddHire(draggedRole, monthIndex, 1);
             draggedRole = null;
             hoveredCell = null;
             console.log("✅ Hire added successfully");
@@ -58,7 +66,7 @@
     }
 
     function handleRemoveHire(id: string) {
-        plannerStore.removeHire(id);
+        onRemoveHire(id);
     }
 
     function handleResizeStart(
@@ -104,18 +112,14 @@
 
         if (monthIndex < 0 || monthIndex >= 24) return;
 
-        const hire = hires.find((h) => h.id === dragMode?.hireId);
-        if (!hire) return;
+        const hire = hires.find((h: any) => h.id === dragMode?.hireId);
+        if (!hire || !dragMode) return;
 
         if (dragMode.type === "resize-right") {
             // Expanding/shrinking from the right
             const newDuration = Math.max(1, monthIndex - hire.startMonth + 1);
             if (newDuration !== hire.duration) {
-                plannerStore.updateHireDuration(
-                    hire.id,
-                    newDuration,
-                    hire.startMonth,
-                );
+                onUpdateHireDuration(hire.id, newDuration, hire.startMonth);
             }
         } else if (dragMode.type === "resize-left") {
             // Expanding/shrinking from the left
@@ -127,11 +131,7 @@
                 newStartMonth !== hire.startMonth ||
                 newDuration !== hire.duration
             ) {
-                plannerStore.updateHireDuration(
-                    hire.id,
-                    newDuration,
-                    newStartMonth,
-                );
+                onUpdateHireDuration(hire.id, newDuration, newStartMonth);
             }
         }
     }
@@ -143,9 +143,6 @@
     function handleTouchEnd() {
         dragMode = null;
     }
-
-    const calc = $derived($calculations);
-    const hires: any[] = $derived($plannerStore.hires);
 
     // Show only one empty row for new hires
     const emptyRowsCount = 1;

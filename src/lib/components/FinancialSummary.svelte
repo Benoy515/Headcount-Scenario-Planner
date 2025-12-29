@@ -1,16 +1,15 @@
 <script lang="ts">
-    import { plannerStore, calculations } from "../stores/plannerStore.js";
     import { formatCurrency } from "../utils/calculations.js";
 
+    let { startingCash, calculations, onUpdateStartingCash } = $props();
+
     let isEditing = $state(false);
-    let inputValue = $state(String($plannerStore.startingCash));
+    let inputValue = $state("");
 
     function handleCashUpdate() {
         const amount = parseFloat(String(inputValue));
         if (!isNaN(amount) && amount >= 0) {
-            plannerStore.setStartingCash(amount);
-        } else {
-            inputValue = String($plannerStore.startingCash);
+            onUpdateStartingCash(amount);
         }
         isEditing = false;
     }
@@ -19,21 +18,19 @@
         if (event.key === "Enter") {
             handleCashUpdate();
         } else if (event.key === "Escape") {
-            inputValue = String($plannerStore.startingCash);
             isEditing = false;
         }
     }
 
     function startEditing() {
-        inputValue = String($plannerStore.startingCash);
+        inputValue = String(startingCash);
         isEditing = true;
     }
 
-    const calc = $derived($calculations);
     const runwayColor = $derived(
-        calc.runwayStatus === "green"
+        calculations.runwayStatus === "green"
             ? "bg-green-100 text-green-800 border-green-300"
-            : calc.runwayStatus === "yellow"
+            : calculations.runwayStatus === "yellow"
               ? "bg-yellow-100 text-yellow-800 border-yellow-300"
               : "bg-red-100 text-red-800 border-red-300",
     );
@@ -61,7 +58,7 @@
                 aria-label="Edit starting cash"
             >
                 <span class="text-2xl font-bold text-gray-900 dark:text-white">
-                    {formatCurrency($plannerStore.startingCash)}
+                    {formatCurrency(startingCash)}
                 </span>
             </button>
         {/if}
@@ -74,7 +71,7 @@
         </div>
         <div class="px-3 py-2">
             <span class="text-2xl font-bold text-gray-900 dark:text-white">
-                {formatCurrency(calc.currentBurn)}
+                {formatCurrency(calculations.currentBurn)}
             </span>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 maximum across all months
@@ -89,7 +86,7 @@
         </div>
         <div class="px-3 py-2">
             <span class="text-2xl font-bold text-gray-900 dark:text-white">
-                {formatCurrency(calc.averageBurn || 0)}
+                {formatCurrency(calculations.averageBurn || 0)}
             </span>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 across active months
@@ -104,7 +101,7 @@
         </div>
         <div class="px-3 py-2">
             <span class="text-2xl font-bold text-gray-900 dark:text-white">
-                {formatCurrency(calc.totalSpent || 0)}
+                {formatCurrency(calculations.totalSpent || 0)}
             </span>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 cumulative
