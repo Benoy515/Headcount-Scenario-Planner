@@ -152,15 +152,21 @@ export const plannerStore = createPlannerStore();
 export const calculations = derived(plannerStore, ($planner) => {
   const { startingCash, hires } = $planner;
 
+  console.log("🔥 Recalculating burns - hires:", hires.length);
+
   // Calculate monthly burn for each month
   const monthlyBurns = MONTHS.map((_, monthIndex) => {
-    return hires
+    const burn = hires
       .filter(
         (hire) =>
           hire.startMonth <= monthIndex &&
           monthIndex < hire.startMonth + hire.duration,
       )
       .reduce((sum, hire) => sum + hire.salary / 12, 0);
+    if (burn > 0 && monthIndex === 0) {
+      console.log("🔥 Month 0 burn:", burn, "from", hires.length, "hires");
+    }
+    return burn;
   });
 
   // Calculate runway
@@ -187,8 +193,25 @@ export const calculations = derived(plannerStore, ($planner) => {
     runwayMonths = 24;
   }
 
-  // Current monthly burn (month 0)
-  const currentBurn = monthlyBurns[0] || 0;
+  // Current monthly burn - find first non-zero month or use max burn
+  const firstNonZeroBurn = monthlyBurns.find((burn) => burn > 0) || 0;
+  const maxBurn = Math.max(...monthlyBurns, 0);
+  const currentBurn = firstNonZeroBurn > 0 ? maxBurn : 0;
+
+  // Calculate total spent (cumulative burn up to runway end or month 24)
+  const monthsToCalculate =
+    runoutMonth !== -1 ? runoutMonth + 1 : Math.min(runwayMonths, 24);
+  const totalSpent = monthlyBurns
+    .slice(0, monthsToCalculate)
+    .reduce((sum, burn) => sum + burn, 0);
+
+  // Calculate average monthly burn (only count months with burn > 0)
+  const monthsWithBurn = monthlyBurns.filter((burn) => burn > 0);
+  const averageBurn =
+    monthsWithBurn.length > 0
+      ? monthsWithBurn.reduce((sum, burn) => sum + burn, 0) /
+        monthsWithBurn.length
+      : 0;
 
   // Runway status
   let runwayStatus = "green";
@@ -203,5 +226,7 @@ export const calculations = derived(plannerStore, ($planner) => {
     currentBurn,
     runwayMonths,
     runwayStatus,
+    totalSpent,
+    averageBurn,
   };
 });

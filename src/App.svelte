@@ -113,41 +113,41 @@
     </header>
 
     <!-- Main Content -->
-    <main class="mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Financial Summary -->
-        <div class="max-w-7xl mx-auto">
-            <FinancialSummary />
-        </div>
+    <main class="px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex gap-6 max-w-full mx-auto">
+            <!-- Left Sidebar: Role Palette -->
+            <div class="w-64 shrink-0">
+                <RolePalette ondragstart={handleDragStart} />
+            </div>
 
-        <!-- Calendar Grid -->
-        <div
-            class="max-w-400 mx-auto"
-            ondragover={(e) => e.preventDefault()}
-            ondragend={handleDragEnd}
-            bind:this={timelineRef}
-            role="region"
-            aria-label="Calendar drag and drop area"
-        >
-            <TimelineGrid bind:draggedRole />
-        </div>
+            <!-- Right Content: Combined Financial Summary + Timeline Grid -->
+            <div
+                class="flex-1 min-w-0"
+                ondragover={(e) => e.preventDefault()}
+                ondragend={handleDragEnd}
+                bind:this={timelineRef}
+                role="region"
+                aria-label="Calendar drag and drop area"
+            >
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6"
+                >
+                    <!-- Financial Summary (inside same box) -->
+                    <FinancialSummary />
 
-        <!-- Role Palette -->
-        <div class="max-w-7xl mx-auto">
-            <RolePalette ondragstart={handleDragStart} />
+                    <!-- Horizontal Divider -->
+                    <div
+                        class="border-t border-gray-200 dark:border-gray-700 my-6"
+                    ></div>
+
+                    <!-- Timeline Grid (inside same box) -->
+                    <TimelineGrid bind:draggedRole />
+                </div>
+            </div>
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer
-        class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-12"
-    >
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <p class="text-center text-sm text-gray-500 dark:text-gray-400">
-                Built with Svelte + Tailwind CSS · Drag roles onto the timeline
-                to plan your team
-            </p>
-        </div>
-    </footer>
+    
 </div>
 
 <style>
