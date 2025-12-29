@@ -1,7 +1,8 @@
 <script lang="ts">
     import { MONTHS } from "../stores/plannerStore.js";
     import { formatCurrency } from "../utils/calculations.js";
-    import { Trash2 } from "lucide-svelte";
+    import { Trash2, ChevronLeft, ChevronRight } from "lucide-svelte";
+    import { onMount } from "svelte";
 
     let {
         scenario,
@@ -20,9 +21,16 @@
         | { type: "resize-right"; hireId: string }
         | null = $state(null);
     let descriptiveMode = $state(false);
+    let isTouchDevice = $state(false);
 
     const hires = $derived(scenario.hires);
     const calc = $derived(calculations);
+
+    onMount(() => {
+        // Detect if device supports touch
+        isTouchDevice =
+            "ontouchstart" in window || navigator.maxTouchPoints > 0;
+    });
 
     function handleDragOver(
         e: DragEvent,
@@ -67,6 +75,35 @@
 
     function handleRemoveHire(id: string) {
         onRemoveHire(id);
+    }
+
+    function handleExtendLeft(hire: any) {
+        const newStartMonth = Math.max(0, hire.startMonth - 1);
+        const newDuration = hire.duration + (hire.startMonth - newStartMonth);
+        onUpdateHireDuration(hire.id, newDuration, newStartMonth);
+    }
+
+    function handleShrinkLeft(hire: any) {
+        if (hire.duration > 1) {
+            onUpdateHireDuration(
+                hire.id,
+                hire.duration - 1,
+                hire.startMonth + 1,
+            );
+        }
+    }
+
+    function handleExtendRight(hire: any) {
+        const endMonth = hire.startMonth + hire.duration - 1;
+        if (endMonth < 23) {
+            onUpdateHireDuration(hire.id, hire.duration + 1, hire.startMonth);
+        }
+    }
+
+    function handleShrinkRight(hire: any) {
+        if (hire.duration > 1) {
+            onUpdateHireDuration(hire.id, hire.duration - 1, hire.startMonth);
+        }
     }
 
     function handleResizeStart(
@@ -244,25 +281,57 @@
                                     group"
                             >
                                 {#if isStart}
-                                    <!-- Left resize handle -->
-                                    <div
-                                        class="absolute left-0 top-0 bottom-0 w-3 bg-white/40 hover:bg-white/60 active:bg-white/70 cursor-ew-resize transition-all z-10 rounded-l-lg touch-manipulation"
-                                        onmousedown={(e) =>
-                                            handleResizeStart(
-                                                e,
-                                                hire.id,
-                                                "left",
-                                            )}
-                                        ontouchstart={(e) =>
-                                            handleResizeStart(
-                                                e,
-                                                hire.id,
-                                                "left",
-                                            )}
-                                        role="button"
-                                        tabindex="0"
-                                        aria-label="Resize start date"
-                                    ></div>
+                                    {#if isTouchDevice}
+                                        <!-- Touch-friendly arrow buttons for left side -->
+                                        <div
+                                            class="absolute left-0 top-0 bottom-0 flex flex-col justify-center z-20 pl-1"
+                                        >
+                                            <button
+                                                onclick={() =>
+                                                    handleExtendLeft(hire)}
+                                                class="w-6 h-6 mb-0.5 rounded bg-white/80 hover:bg-white active:bg-blue-200 text-gray-700 flex items-center justify-center transition-all shadow-sm touch-manipulation"
+                                                aria-label="Extend hire start by 1 month"
+                                                title="Extend left"
+                                            >
+                                                <ChevronLeft
+                                                    size={14}
+                                                    strokeWidth={3}
+                                                />
+                                            </button>
+                                            <button
+                                                onclick={() =>
+                                                    handleShrinkLeft(hire)}
+                                                class="w-6 h-6 rounded bg-white/80 hover:bg-white active:bg-red-200 text-gray-700 flex items-center justify-center transition-all shadow-sm touch-manipulation"
+                                                aria-label="Shrink hire start by 1 month"
+                                                title="Shrink left"
+                                            >
+                                                <ChevronRight
+                                                    size={14}
+                                                    strokeWidth={3}
+                                                />
+                                            </button>
+                                        </div>
+                                    {:else}
+                                        <!-- Desktop: Left resize handle -->
+                                        <div
+                                            class="absolute left-0 top-0 bottom-0 w-3 bg-white/40 hover:bg-white/60 active:bg-white/70 cursor-ew-resize transition-all z-10 rounded-l-lg touch-manipulation"
+                                            onmousedown={(e) =>
+                                                handleResizeStart(
+                                                    e,
+                                                    hire.id,
+                                                    "left",
+                                                )}
+                                            ontouchstart={(e) =>
+                                                handleResizeStart(
+                                                    e,
+                                                    hire.id,
+                                                    "left",
+                                                )}
+                                            role="button"
+                                            tabindex="0"
+                                            aria-label="Resize start date"
+                                        ></div>
+                                    {/if}
 
                                     <!-- Show role info on start month -->
                                     {#if descriptiveMode}
@@ -307,25 +376,57 @@
                                 {/if}
 
                                 {#if isEnd}
-                                    <!-- Right resize handle -->
-                                    <div
-                                        class="absolute right-0 top-0 bottom-0 w-3 bg-white/40 hover:bg-white/60 active:bg-white/70 cursor-ew-resize transition-all z-10 rounded-r-lg touch-manipulation"
-                                        onmousedown={(e) =>
-                                            handleResizeStart(
-                                                e,
-                                                hire.id,
-                                                "right",
-                                            )}
-                                        ontouchstart={(e) =>
-                                            handleResizeStart(
-                                                e,
-                                                hire.id,
-                                                "right",
-                                            )}
-                                        role="button"
-                                        tabindex="0"
-                                        aria-label="Resize end date"
-                                    ></div>
+                                    {#if isTouchDevice}
+                                        <!-- Touch-friendly arrow buttons for right side -->
+                                        <div
+                                            class="absolute right-0 top-0 bottom-0 flex flex-col justify-center z-20 pr-1"
+                                        >
+                                            <button
+                                                onclick={() =>
+                                                    handleExtendRight(hire)}
+                                                class="w-6 h-6 mb-0.5 rounded bg-white/80 hover:bg-white active:bg-blue-200 text-gray-700 flex items-center justify-center transition-all shadow-sm touch-manipulation"
+                                                aria-label="Extend hire end by 1 month"
+                                                title="Extend right"
+                                            >
+                                                <ChevronRight
+                                                    size={14}
+                                                    strokeWidth={3}
+                                                />
+                                            </button>
+                                            <button
+                                                onclick={() =>
+                                                    handleShrinkRight(hire)}
+                                                class="w-6 h-6 rounded bg-white/80 hover:bg-white active:bg-red-200 text-gray-700 flex items-center justify-center transition-all shadow-sm touch-manipulation"
+                                                aria-label="Shrink hire end by 1 month"
+                                                title="Shrink right"
+                                            >
+                                                <ChevronLeft
+                                                    size={14}
+                                                    strokeWidth={3}
+                                                />
+                                            </button>
+                                        </div>
+                                    {:else}
+                                        <!-- Desktop: Right resize handle -->
+                                        <div
+                                            class="absolute right-0 top-0 bottom-0 w-3 bg-white/40 hover:bg-white/60 active:bg-white/70 cursor-ew-resize transition-all z-10 rounded-r-lg touch-manipulation"
+                                            onmousedown={(e) =>
+                                                handleResizeStart(
+                                                    e,
+                                                    hire.id,
+                                                    "right",
+                                                )}
+                                            ontouchstart={(e) =>
+                                                handleResizeStart(
+                                                    e,
+                                                    hire.id,
+                                                    "right",
+                                                )}
+                                            role="button"
+                                            tabindex="0"
+                                            aria-label="Resize end date"
+                                        ></div>
+                                    {/if}
                                 {/if}
                             </div>
                         {/if}
@@ -413,7 +514,12 @@
         </button>
     </div>
     <div class="flex-1 text-right">
-        <strong>Tip:</strong> Drag edges of hire bars to adjust duration. Left edge
-        adjusts start date, right edge adjusts end date.
+        {#if isTouchDevice}
+            <strong>Tip:</strong> Use the arrow buttons on hire bars to adjust duration.
+            Outer arrows extend, inner arrows shrink.
+        {:else}
+            <strong>Tip:</strong> Drag edges of hire bars to adjust duration. Left
+            edge adjusts start date, right edge adjusts end date.
+        {/if}
     </div>
 </div>

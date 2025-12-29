@@ -11,6 +11,14 @@
 
     const secondsPerMonth = 30 * 24 * 60 * 60; // Approximate
 
+    const formattedBurn = $derived(() => {
+        if (currentBurn >= 1000000) {
+            return `$${(currentBurn / 1000000).toFixed(1)}M`;
+        } else {
+            return `$${(currentBurn / 1000).toFixed(0)}k`;
+        }
+    });
+
     function updateCountdown() {
         const totalSeconds = runwayMonths * secondsPerMonth;
         const now = Date.now();
@@ -136,9 +144,7 @@
     <div class="space-y-2 text-sm">
         <div class="flex justify-between text-gray-300">
             <span>💸 Burning:</span>
-            <span class="font-bold text-red-400"
-                >${(currentBurn / 1000).toFixed(0)}k/month</span
-            >
+            <span class="font-bold text-red-400">{formattedBurn()}/month</span>
         </div>
         <div class="flex justify-between text-gray-300">
             <span>🔥 Total Burned:</span>

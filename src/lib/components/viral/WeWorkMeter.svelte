@@ -13,6 +13,14 @@
                 ? "high"
                 : "critical",
     );
+
+    const formattedBurn = $derived(() => {
+        if (currentBurn >= 1000000) {
+            return `$${(currentBurn / 1000000).toFixed(1)}M`;
+        } else {
+            return `$${(currentBurn / 1000).toFixed(0)}k`;
+        }
+    });
 </script>
 
 <div class="wework-meter-container">
@@ -121,7 +129,7 @@
             class="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 border-2 border-gray-300 dark:border-gray-600"
         >
             <div class="text-2xl font-bold text-gray-900 dark:text-white">
-                ${(currentBurn / 1000).toFixed(0)}k
+                {formattedBurn()}
             </div>
             <div class="text-xs text-gray-600 dark:text-gray-400 mt-1">
                 Per Month

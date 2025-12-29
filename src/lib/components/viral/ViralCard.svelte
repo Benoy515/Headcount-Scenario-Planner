@@ -11,6 +11,14 @@
         size?: "small" | "medium" | "large";
     } = $props();
 
+    const formattedSalary = $derived(() => {
+        if (role.salary >= 1000000) {
+            return `$${(role.salary / 1000000).toFixed(1)}M`;
+        } else {
+            return `$${(role.salary / 1000).toFixed(0)}k`;
+        }
+    });
+
     const sizeClasses = {
         small: "w-32 h-44",
         medium: "w-40 h-56",
@@ -148,7 +156,7 @@
         >
             <div class="text-center">
                 <div class="text-yellow-400 font-bold text-sm leading-none">
-                    ${(role.salary / 1000).toFixed(0)}k
+                    {formattedSalary()}
                 </div>
                 <div class="text-white/60 text-[8px] uppercase tracking-wider">
                     per year

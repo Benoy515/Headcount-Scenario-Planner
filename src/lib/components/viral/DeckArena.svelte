@@ -31,6 +31,14 @@
         deck.reduce((sum, role) => sum + (role ? role.salary : 0), 0),
     );
 
+    const formattedBurn = $derived(() => {
+        if (totalBurn >= 1000000) {
+            return `$${(totalBurn / 1000000).toFixed(1)}M`;
+        } else {
+            return `$${(totalBurn / 1000).toFixed(0)}k`;
+        }
+    });
+
     let startingCash = $state(2000000);
     const monthlyBurn = $derived(totalBurn / 12);
     const runwayMonths = $derived(
@@ -140,7 +148,7 @@
                     </div>
                     <div>
                         <div class="text-2xl font-bold text-orange-400">
-                            ${(totalBurn / 1000).toFixed(0)}k
+                            {formattedBurn()}
                         </div>
                         <div class="text-xs text-purple-300 uppercase">
                             Annual Burn
