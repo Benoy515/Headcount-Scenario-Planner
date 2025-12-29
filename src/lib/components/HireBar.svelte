@@ -1,5 +1,6 @@
 <script>
     import { formatCurrency } from "../utils/calculations.js";
+    import { Trash2 } from "lucide-svelte";
 
     const { hire, totalMonths, onremove } = $props();
 
@@ -31,10 +32,10 @@
 
         <button
             onclick={onremove}
-            class="ml-2 shrink-0 w-6 h-6 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+            class="ml-2 shrink-0 w-8 h-8 rounded-full bg-white/20 hover:bg-red-500/90 active:bg-red-600 text-white hover:text-white flex items-center justify-center transition-all touch-manipulation backdrop-blur-sm"
             aria-label="Remove hire"
         >
-            ✕
+            <Trash2 size={16} strokeWidth={2} />
         </button>
     </div>
 </div>

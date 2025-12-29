@@ -13,7 +13,7 @@ export const ROLES = [
   {
     type: "engineer",
     label: "Engineer",
-    salary: 150000,
+    salary: 200000,
     icon: Code2,
     color: "bg-blue-400",
   },
@@ -34,21 +34,21 @@ export const ROLES = [
   {
     type: "product",
     label: "Product Manager",
-    salary: 140000,
+    salary: 160000,
     icon: ClipboardList,
     color: "bg-orange-400",
   },
   {
     type: "data",
     label: "Data Analyst",
-    salary: 135000,
+    salary: 110000,
     icon: BarChart3,
     color: "bg-cyan-400",
   },
   {
     type: "marketing",
     label: "Marketing",
-    salary: 110000,
+    salary: 90000,
     icon: Megaphone,
     color: "bg-pink-400",
   },

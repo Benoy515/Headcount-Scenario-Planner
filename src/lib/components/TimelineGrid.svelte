@@ -5,6 +5,7 @@
         MONTHS,
     } from "../stores/plannerStore.js";
     import { formatCurrency } from "../utils/calculations.js";
+    import { Trash2 } from "lucide-svelte";
 
     let { draggedRole = $bindable(null) } = $props();
     let hoveredCell: { row: number; month: number } | null = $state(null);
@@ -144,6 +145,11 @@
         <div
             class="flex sticky top-0 z-10 bg-gray-50 dark:bg-gray-800 border-b-2 border-gray-300 dark:border-gray-600"
         >
+            <!-- Empty header cell for delete button column -->
+            <div
+                class="shrink-0 w-12 border-r border-gray-200 dark:border-gray-700"
+            ></div>
+
             {#each MONTHS as month, i (i)}
                 <div
                     class="shrink-0 w-20 p-2 border-r border-gray-200 dark:border-gray-700 text-center"
@@ -170,6 +176,21 @@
             <div
                 class="flex border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
             >
+                <!-- Delete button column -->
+                <div
+                    class="shrink-0 w-12 border-r border-gray-200 dark:border-gray-700 flex items-center justify-center {descriptiveMode
+                        ? 'min-h-36'
+                        : 'min-h-16'}"
+                >
+                    <button
+                        onclick={() => handleRemoveHire(hire.id)}
+                        class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-red-500 active:bg-red-600 text-gray-600 dark:text-gray-300 hover:text-white flex items-center justify-center transition-all touch-manipulation"
+                        aria-label="Remove {hire.roleLabel}"
+                    >
+                        <Trash2 size={16} strokeWidth={2} />
+                    </button>
+                </div>
+
                 <!-- Month cells for this hire -->
                 {#each MONTHS as month, monthIndex (monthIndex)}
                     {@const isActive =
@@ -258,16 +279,6 @@
                                             />
                                         </div>
                                     {/if}
-
-                                    <!-- Remove button (visible on hover) -->
-                                    <button
-                                        onclick={() =>
-                                            handleRemoveHire(hire.id)}
-                                        class="absolute top-1 right-1 w-5 h-5 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold z-10"
-                                        aria-label="Remove hire"
-                                    >
-                                        ×
-                                    </button>
                                 {/if}
 
                                 {#if isEnd}
@@ -300,6 +311,13 @@
                     ? 'min-h-32'
                     : 'min-h-16'}"
             >
+                <!-- Empty delete button column for new hire rows -->
+                <div
+                    class="shrink-0 w-12 border-r border-gray-200 dark:border-gray-700 {descriptiveMode
+                        ? 'min-h-32'
+                        : 'min-h-16'}"
+                ></div>
+
                 <!-- Month cells -->
                 {#each MONTHS as month, monthIndex (monthIndex)}
                     <div
