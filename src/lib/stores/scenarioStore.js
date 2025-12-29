@@ -135,6 +135,19 @@ function createScenariosStore() {
             : s,
         ),
       })),
+
+    // Load scenarios from shared state (add to existing)
+    loadScenarios: (newScenarios) =>
+      update((state) => ({
+        ...state,
+        scenarios: [...state.scenarios, ...newScenarios],
+      })),
+
+    // Replace all scenarios with loaded scenarios
+    replaceScenarios: (newScenarios) =>
+      set({
+        scenarios: newScenarios,
+      }),
   };
 }
 
