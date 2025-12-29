@@ -4,12 +4,19 @@ import {
   Briefcase,
   Palette,
   ClipboardList,
-  BarChart3,
+  Rocket,
   Megaphone,
 } from "lucide-svelte";
 
 // Role definitions
 export const ROLES = [
+  {
+    type: "founder",
+    label: "Founder",
+    salary: 60000,
+    icon: Rocket,
+    color: "bg-cyan-400",
+  },
   {
     type: "engineer",
     label: "Engineer",
@@ -37,13 +44,6 @@ export const ROLES = [
     salary: 160000,
     icon: ClipboardList,
     color: "bg-orange-400",
-  },
-  {
-    type: "data",
-    label: "Data Analyst",
-    salary: 110000,
-    icon: BarChart3,
-    color: "bg-cyan-400",
   },
   {
     type: "marketing",

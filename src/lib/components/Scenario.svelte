@@ -2,9 +2,12 @@
     import FinancialSummary from "./FinancialSummary.svelte";
     import TimelineGrid from "./TimelineGrid.svelte";
     import { scenariosStore } from "../stores/scenarioStore.js";
-    import { Trash2, ChevronDown, ChevronUp } from "lucide-svelte";
+    import { Trash2, ChevronDown, ChevronUp, Pencil } from "lucide-svelte";
 
     let { scenario, calculations, draggedRole = $bindable(null) } = $props();
+
+    let isEditingName = $state(false);
+    let nameInputValue = $state("");
 
     function handleToggleCollapse() {
         scenariosStore.toggleCollapse(scenario.id);
@@ -12,6 +15,27 @@
 
     function handleDelete() {
         scenariosStore.removeScenario(scenario.id);
+    }
+
+    function startEditingName() {
+        nameInputValue = scenario.name;
+        isEditingName = true;
+    }
+
+    function handleNameUpdate() {
+        const trimmedName = nameInputValue.trim();
+        if (trimmedName.length > 0) {
+            scenariosStore.updateName(scenario.id, trimmedName);
+        }
+        isEditingName = false;
+    }
+
+    function handleNameKeydown(event: KeyboardEvent) {
+        if (event.key === "Enter") {
+            handleNameUpdate();
+        } else if (event.key === "Escape") {
+            isEditingName = false;
+        }
     }
 
     function handleSetStartingCash(amount: number) {
@@ -49,14 +73,31 @@
     >
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-3 flex-1">
-                <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">
-                    {scenario.name}
-                </h2>
-                {#if !scenario.collapsed}
-                    <div class="text-sm text-gray-600 dark:text-gray-400">
-                        {scenario.hires.length}
-                        {scenario.hires.length === 1 ? "hire" : "hires"}
-                    </div>
+                {#if isEditingName}
+                    <input
+                        type="text"
+                        bind:value={nameInputValue}
+                        onblur={handleNameUpdate}
+                        onkeydown={handleNameKeydown}
+                        class="text-xl font-bold text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 border border-blue-400 dark:border-blue-500 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        aria-label="Scenario name"
+                    />
+                {:else}
+                    <h2
+                        class="text-xl font-bold text-gray-800 dark:text-gray-100"
+                    >
+                        {scenario.name}
+                    </h2>
+                    {#if !scenario.collapsed}
+                        <button
+                            onclick={startEditingName}
+                            class="p-1.5 rounded-lg hover:bg-white dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all"
+                            aria-label="Edit scenario name"
+                            title="Edit scenario name"
+                        >
+                            <Pencil size={16} strokeWidth={2} />
+                        </button>
+                    {/if}
                 {/if}
             </div>
 
